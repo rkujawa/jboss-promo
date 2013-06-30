@@ -104,7 +104,7 @@
 }
 }
 
-\title{Nowości w \\ JBoss Enterprise Application Platform 6}
+\title{Nowości technologiczne w \\ JBoss Enterprise Application Platform 6: \\ zarządzanie w dużych ogranizacjach}
 
 
 \author{Radosław Kujawa -- radoslaw.kujawa@osec.pl}
@@ -125,10 +125,95 @@
 }
 \end{frame}
 
-\section{Nowe funkcje}
+
+\section{Podstawowe informacje o JBoss EAP 6}
 
 \begin{frame}
-\frametitle{Foo bar?}
+\frametitle{Podstawowe informacje o JBoss EAP 6}
+\begin{itemize}
+	\item Nowe wydanie JBoss EAP 6 jest oparte o JBoss AS 7 (teraz ,,Wildfly'')
+	
+	\item JBoss EAP 6 na Red Hat Enterprise Linux -- silnie zintegrowana platforma, dostarczająca jednolite narzędzia i poziom bezpieczeństwa
+	\begin{itemize}
+		\item Do tej pory -- serwer aplikacyjny i system operacyjny osobno.
+		\item Teraz -- Red Hat pragnie by platforma była rozpatrywana całościowo.
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\section{Nowe funkcje w kontekście zarządzania}
+
+\begin{frame}
+\frametitle{Zarządzanie w dużych środowiskach}
+\begin{itemize}
+
+	\item Przy większej skali ręczne zmiany w konfiguracji środowisk są ...
+	\item Problematyczne w poprzednich wersjach EAP
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nowe API do zarządzania platformą}
+\begin{itemize}
+	\item Całkowicie przepisany w porównaniu z EAP5
+	\item Oparty o komunikaty JSON
+	\item Minimalny zestaw bibliotek klienckich
+	\item Teraz wszystkie modyfikacje konfiguracji serwera możliwe ze skryptów
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Instalacja i aktualizacja JBoss EAP z użyciem yum/rpm}
+\begin{itemize}
+	\item Od wersji 6 preferowaną metodą instalacji i aktualizacji jest użycie tych samych mechanizmów, które używane są do zarządzania innym operogramowaniem w RHEL - yum oraz rpm\footnote{Instalacja dalej jest możliwa też na ,,stary'' sposób - poprzez rozpakowanie zip'a lub użycie graficznego instalatora.}.
+	\item Trywialna instalacja
+	\begin{itemize}
+		\item Włączenie kanału JBoss EAP 6 dla danej maszyny w RHN / Satellite
+		\item {\tt yum groupinstall jboss-eap6}
+	\end{itemize}
+	\item Łatwe aktualizacje systemu operacyjnego oraz serwera aplikacji
+	\begin{itemize}
+		\item {\tt yum update \&\& service jboss-xxx restart}
+	\end{itemize}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instalacja i aktualizacja JBoss EAP z użyciem yum/rpm - c.d.}
+\begin{itemize}
+	\item Struktura katalogów przyjazna dla administratora systemu operacyjnego
+	\begin{itemize}
+		\item Logi w {\tt /var/log}, konfiguracja w {\tt /etc}, itd.
+		\item ,,Stara'' struktura dostępna przez {\tt /usr/share/jbossas}.
+	\end{itemize}
+	\item Osobna usługa systemu operacyjnego dla każdej instancji JBossa.
+	\item Domyślne przykładowe konfiguracje dla trybów osadzenia {\tt standalone} oraz {\tt domain}.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instalacja i aktualizacja JBoss EAP z użyciem yum/rpm - c.d.}
+\begin{itemize}
+	\item Użycie yum/rpm powoduje, że do zarządzania instalacjami JBoss można użych tych samych narzędzi co do zarządzania systemem.
+	\begin{itemize}
+		\item Red Hat Network / Red Hat Satellite / SpaceWalk
+	\end{itemize}
+	\item Łatwa weryfikacja poziomu ,,dopatchowania''
+	\item Które JBossy wymagają instalacji poprawek?
+	\item Uniknięcie problemu wdrożonych serwerów aplikacyjnych, które nigdy później nie są aktualizowane i stanowią zagrożenie bezpieczeństwa.
+
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{JBoss EAP a OpenShift}
 \begin{itemize}
 	\item Foo
 	\item Bar \textbf{xyz}
