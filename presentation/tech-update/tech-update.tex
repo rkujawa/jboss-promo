@@ -80,7 +80,7 @@
 }
 
 \lstset{
-   language=sh,
+   language=java,
    basicstyle=\tiny,
    breaklines=true,
    escapechar=\@,
@@ -203,6 +203,7 @@
 	\item Łatwa weryfikacja poziomu ,,dopatchowania''
 	\item Które JBossy wymagają instalacji poprawek?
 	\item Uniknięcie problemu wdrożonych serwerów aplikacyjnych, które nigdy później nie są aktualizowane i stanowią zagrożenie bezpieczeństwa.
+	\item Aktualizacje obejmują maszynę wirtualną Java.
 \end{itemize}
 \end{frame}
 
@@ -212,8 +213,6 @@
 \frametitle{Nowe API do zarządzania platformą}
 \begin{itemize}
 	\item Całkowicie przepisane w porównaniu z EAP5, zastępuje dotychczasowe API JMX
-	\item Oparte o komunikaty JSON
-	\item ,,Zdetypowane'' -- zmiany możliwe z innej maszyny nawet bez natywnych bibliotek serwera
 	\item Modyfikacja wszystkich elementów konfiguracji serwera możliwa za pomocą API
 	\begin{itemize}
 		\item Klient linii komend dający pełny dostęp do API
@@ -226,29 +225,95 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Zalety nowego API}
+\frametitle{Cechy nowego API}
 \begin{itemize}
-	\item Skryptowalne operacje związane z zarządzaniem aplikacjami na serwerze: osadzenie nowej aplikacji (także zdalnie), zatrzymanie i usunięcie aplikacji
-	\item Rolling deployment za pomocą tzw. deployment planów
-	\item Konfiguracja konektorów baz danych
-	\item Łatwiejsze tworzenie testów integracyjnych (zmiany konfiguracji serwera z poziomu maven'a, osadzanie aplikacji np. za pomocą plugina CARGO)
-	\item Możliwość tworzenia wtyczek do monitoringu dla oprogramowania producentów trzecich
+	\item Prostota i funkcjonalność
+	\item Oparte o komunikaty JSON
+	\item ,,Zdetypowane'' -- zmiany możliwe z innej maszyny nawet bez natywnych bibliotek serwera, każdy klient HTTP może służyć do zarządznia serwerem
+	\item Pozwala na przesyłanie nie tylko konfiguracji, ale także artefaktów na zdalne maszyny
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Przykład wykorzystania API z klienta HTTP}
+\begin{verbatim}
+$ curl --digest -L -D - \
+> http://admin:admin123@localhost:9990/management \
+> --header "Content-Type: application/json" -d \
+> '{"operation":"read-attribute","name":"server-state",\
+> "json.pretty":1}'
+
+{
+    "outcome" : "success",
+    "result" : "running"
+}
+\end{verbatim}
+\end{frame}
+
+%Skryptowalne operacje związane z zarządzaniem aplikacjami na serwerze: osadzenie nowej aplikacji (także zdalnie), zatrzymanie i usunięcie aplikacji
+%
+
 \begin{frame}
-\frametitle{Przykładowe operacje możliwe do wykonania za pomocą API}
+\frametitle{Przykładowe zastosowania nowego API}
 \begin{itemize}
-	\item Kod
+	\item Automatyzacja rutynowych czynności
+	\begin{itemize}
+		\item Wdrożenie nowej wersji istniejącej aplikacji
+		\item Przełączenie bazy danych
+		\item Rolling deployment za pomocą tzw. deployment planów
+	\end{itemize}
+	\item Monitoring
+	\begin{itemize}
+		\item Skrypty weryfikujące poprawność pracy serwera
+		\item Wtyczki do monitoringu dla oprogramowania producentów trzecich
+	\end{itemize}
+	\item Testowanie (w procesie wytwarznia oprogramowania)
+	\begin{itemize}
+		\item Łatwiejsze tworzenie testów integracyjnych (zmiany konfiguracji i osadzanie aplikacji bez pośrednio z maven'a, np. za pomocą plugina \href{http://cargo.codehaus.org/}{CARGO})
+	\end{itemize}
 \end{itemize}
 \end{frame}
 
+\section{Zarządzanie za pomocą domen}
 
 \begin{frame}
-\frametitle{Inne funkcjonalności godne wspomnienia}
+\frametitle{Zarządzanie za pomocą domen}
 \begin{itemize}
-	\item Uproszczone zarządzanie większą liczbą serwerów o takiej samej konfiguracji dzięki domenom oraz profilom.
-	\item Bar \textbf{xyz}
+	\item Użycie trybu {\tt domain} pozwawla na uproszczenie i ujednolicenie zarządzania większą liczbą serwerów aplikacyjnych\footnote{Dostępny jest też tryb {\tt standalone}, który ideologicznie jest bliski EAP 5}.
+	\item ,,Kontroler domeny'' -- zwykle dedykowana maszyna z instancją JBoss, która służy jedynie do zarządzania domeną
+	\item ,,Kontroler hosta'' -- instancja JBoss, która służy do do kontrolowania instancji (węzłów) JBoss na danej maszynie
+	\item ,,Węzeł'' -- instancja JBoss, na której osadzone są aplikacje
+	\item ,,Profil'' -- definiuje konfigurację węzła
+	\item ,,Grupa serwerów'' -- zbiór węzłów o identycznej konfiguracji, w ramach domeny może istnieć wiele grup
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Zarządzanie za pomocą domen - diagram}
+\begin{center}
+	\includegraphics[scale=0.42]{img-domain-mode.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Zarządzanie za pomocą domen - zalety i wady}
+\begin{itemize}
+	\item Zalety
+	\begin{itemize}
+		\item Szybkie i łatwe wprowadzanie zmian na masową skalę
+		\item Jeden punkt zarządzania dla wszystkich instancji JBoss
+		\begin{itemize}
+			\item Wdrożenia i aktualizacje aplikacji z jednego punktu
+			\item Konta administracyjne zdefiniowane w jednym punkcie
+		\end{itemize}
+		\item Możliwość użycia konsoli web lub API do wprowadzenia zmian w całej domenie za pośrednictwem kontrolera domeny
+	\end{itemize}
+	\item Wady
+	\begin{itemize}
+		\item Konfiguracja przechowywana na kontrolerze domeny -- potencjalne ryzyko zw. z jej utratą
+		\item Znacznie bardziej skomplikowana infrastruktura, wymagająca większych zasobów
+	\end{itemize}
 \end{itemize}
 \end{frame}
 
