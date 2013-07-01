@@ -126,55 +126,52 @@
 \end{frame}
 
 
-\section{Podstawowe informacje o JBoss EAP 6}
+\section{JBoss EAP a zarządzanie IT w dużej organizacji}
 
 \begin{frame}
-\frametitle{Podstawowe informacje o JBoss EAP 6}
+\frametitle{Zarządzanie JBoss EAP w dużych środowiskach}
+\begin{itemize}
+	\item Problemy w poprzedniej wersji EAP (5.x)
+	\begin{itemize}
+		\item Nawet wykonanie prostych czynności wymagało specjalistycznej wiedzy z zakresu działania serwera aplikacyjnego
+		\item Konsola web praktycznie bezużyteczna dla celów administracji -- konieczność ręcznej edycji plików XML
+		\item Duży stopień skomplikowania konfiguracji, wiele niejawnych zależności między komponentami
+		\item Przy większej skali wdrożenia zmiany w konfiguracji trudne do zaaplikowania
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Zarządzanie JBoss EAP w dużych środowiskach}
 \begin{itemize}
 	\item Nowe wydanie JBoss EAP 6 jest oparte o JBoss AS 7 (teraz ,,Wildfly'')
-	
-	\item JBoss EAP 6 na Red Hat Enterprise Linux -- silnie zintegrowana platforma, dostarczająca jednolite narzędzia i poziom bezpieczeństwa
 	\begin{itemize}
-		\item Do tej pory -- serwer aplikacyjny i system operacyjny osobno.
-		\item Teraz -- Red Hat pragnie by platforma była rozpatrywana całościowo.
+		\item Znacznie silniejsza integracja z Red Hat Enterprise Linux -- jednolite narzędzia do zarządzania i wysoki poziom bezpieczeństwa
+		\item Mechanizmy pozwalające na wprowadzanie zmian w serwerze w sposób zautomatyzowany, nawet w środowiskach dużej skali
+	\end{itemize}
+	\item Próba zmiany sposobu myślenia o serwerze aplikacyjnym
+	\begin{itemize}
+		\item Nowe podejście: traktujmy platformę składającą się z serwera aplikacyjnego i systemu operacyjnego jako całość
 	\end{itemize}
 \end{itemize}
 \end{frame}
 
 
-\section{Nowe funkcje w kontekście zarządzania}
-
-\begin{frame}
-\frametitle{Zarządzanie w dużych środowiskach}
-\begin{itemize}
-
-	\item Przy większej skali ręczne zmiany w konfiguracji środowisk są ...
-	\item Problematyczne w poprzednich wersjach EAP
-
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Nowe API do zarządzania platformą}
-\begin{itemize}
-	\item Całkowicie przepisany w porównaniu z EAP5
-	\item Oparty o komunikaty JSON
-	\item Minimalny zestaw bibliotek klienckich
-	\item Teraz wszystkie modyfikacje konfiguracji serwera możliwe ze skryptów
-\end{itemize}
-\end{frame}
 
 
+\section{Metodyka instalacji i aktualizacji}
 
 \begin{frame}
 \frametitle{Instalacja i aktualizacja JBoss EAP z użyciem yum/rpm}
 \begin{itemize}
-	\item Od wersji 6 preferowaną metodą instalacji i aktualizacji jest użycie tych samych mechanizmów, które używane są do zarządzania innym operogramowaniem w RHEL - yum oraz rpm\footnote{Instalacja dalej jest możliwa też na ,,stary'' sposób - poprzez rozpakowanie zip'a lub użycie graficznego instalatora.}.
+	\item Od wersji 6 preferowaną metodą instalacji i aktualizacji jest użycie tych samych mechanizmów {\tt yum} oraz {\tt rpm}, które używane są do zarządzania oprogramowaniem w RHEL\footnote{Instalacja dalej jest możliwa też na ,,stary'' sposób - poprzez rozpakowanie zip'a lub użycie graficznego instalatora.}.
 	\item Trywialna instalacja
 	\begin{itemize}
-		\item Włączenie kanału JBoss EAP 6 dla danej maszyny w RHN / Satellite
-		\item {\tt yum groupinstall jboss-eap6}
+		\item Włączenie kanału JBoss EAP 6 dla danej maszyny w Red Hat Network
+		\item Na serwerach aplikacyjnych: {\tt yum groupinstall jboss-eap6}
+		\item Na maszynach frontend: {\tt yum install mod\_jk-ap22 mod\_cluster-native}
 	\end{itemize}
+	\item Rozwiązywanie zależności między paczkami
 	\item Łatwe aktualizacje systemu operacyjnego oraz serwera aplikacji
 	\begin{itemize}
 		\item {\tt yum update \&\& service jboss-xxx restart}
@@ -193,48 +190,79 @@
 	\end{itemize}
 	\item Osobna usługa systemu operacyjnego dla każdej instancji JBossa.
 	\item Domyślne przykładowe konfiguracje dla trybów osadzenia {\tt standalone} oraz {\tt domain}.
-
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Instalacja i aktualizacja JBoss EAP z użyciem yum/rpm - c.d.}
 \begin{itemize}
-	\item Użycie yum/rpm powoduje, że do zarządzania instalacjami JBoss można użych tych samych narzędzi co do zarządzania systemem.
+	\item Użycie {\tt yum} i {\tt rpm} powoduje, że do zarządzania instalacjami JBoss można użych tych samych narzędzi co do zarządzania systemem.
 	\begin{itemize}
 		\item Red Hat Network / Red Hat Satellite / SpaceWalk
 	\end{itemize}
 	\item Łatwa weryfikacja poziomu ,,dopatchowania''
 	\item Które JBossy wymagają instalacji poprawek?
 	\item Uniknięcie problemu wdrożonych serwerów aplikacyjnych, które nigdy później nie są aktualizowane i stanowią zagrożenie bezpieczeństwa.
+\end{itemize}
+\end{frame}
 
+\section{Nowe API do zarządzania serwerami aplikacyjnymi}
 
+\begin{frame}
+\frametitle{Nowe API do zarządzania platformą}
+\begin{itemize}
+	\item Całkowicie przepisane w porównaniu z EAP5, zastępuje dotychczasowe API JMX
+	\item Oparte o komunikaty JSON
+	\item ,,Zdetypowane'' -- zmiany możliwe z innej maszyny nawet bez natywnych bibliotek serwera
+	\item Modyfikacja wszystkich elementów konfiguracji serwera możliwa za pomocą API
+	\begin{itemize}
+		\item Klient linii komend dający pełny dostęp do API
+		\item Zmiany za pomocą API skutkują zmianami w plikach XML
+		\item W końcu możliwe bezpieczne wykonywanie zmian z konsoli web (konsola też jest klientem API)
+		\item Biblioteki klienckie do budowy własnych skryptów
+	\end{itemize}
+	\item Statystyki pracy serwera dostępne przez API
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{JBoss EAP a OpenShift}
+\frametitle{Zalety nowego API}
 \begin{itemize}
-	\item Foo
+	\item Skryptowalne operacje związane z zarządzaniem aplikacjami na serwerze: osadzenie nowej aplikacji (także zdalnie), zatrzymanie i usunięcie aplikacji
+	\item Rolling deployment za pomocą tzw. deployment planów
+	\item Konfiguracja konektorów baz danych
+	\item Łatwiejsze tworzenie testów integracyjnych (zmiany konfiguracji serwera z poziomu maven'a, osadzanie aplikacji np. za pomocą plugina CARGO)
+	\item Możliwość tworzenia wtyczek do monitoringu dla oprogramowania producentów trzecich
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Przykładowe operacje możliwe do wykonania za pomocą API}
+\begin{itemize}
+	\item Kod
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Inne funkcjonalności godne wspomnienia}
+\begin{itemize}
+	\item Uproszczone zarządzanie większą liczbą serwerów o takiej samej konfiguracji dzięki domenom oraz profilom.
 	\item Bar \textbf{xyz}
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Pytania}
-\begin{itemize}
-	\item Czy są jakieś pytania?
-\end{itemize}
-\end{frame}
-
-\begin{frame}
 \frametitle{Koniec\ldots}
-\vspace*{-0.8cm}
+%\vspace*{0.15cm}
 \begin{center}
 \includegraphics[scale=0.5]{img-oseclogo.png}
 
 Dziękuje!
+
+Czy są pytania?
 \end{center}
+
 \end{frame}
 
  
